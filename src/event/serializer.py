@@ -22,3 +22,13 @@ class LoginSerializer(serializers.ModelSerializer):
     class Meta:
         model=User
         fields='__all__'
+
+class WinnerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=winners
+        fields='__all__'
+
+class awardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Award
+        fields='__all__'

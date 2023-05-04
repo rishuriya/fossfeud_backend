@@ -7,3 +7,7 @@ admin.site.register(Registered)
 admin.site.register(Games)
 
 admin.site.register(gameRounds)
+
+admin.site.register(winners)
+
+admin.site.register(Award)

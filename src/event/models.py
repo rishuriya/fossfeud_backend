@@ -17,7 +17,7 @@ class Registered(models.Model):
 class Games(models.Model):
     Name=models.CharField(max_length=100)
     deduction=models.IntegerField(default=0)
-    award=models.IntegerField(default=0)
+    gameAward=models.ForeignKey("Award", on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return self.Name
@@ -27,8 +27,27 @@ class gameRounds(models.Model):
     Participants=models.ManyToManyField("Registered", blank=True)
     Game=models.ForeignKey(Games, on_delete=models.CASCADE)
     status=models.CharField(choices=CHOICES, max_length=100, default="Pending")
-    Winner=models.CharField(max_length=100, blank=True)
+    Winner=models.ForeignKey("winners", on_delete=models.CASCADE, blank=True, null=True)
     deduction=models.BooleanField(default=True)
 
     def __str__(self):
         return self.Name;
+
+class winners(models.Model):
+    roundId=models.ForeignKey(gameRounds, on_delete=models.CASCADE,blank=True)
+    gameId=models.ForeignKey(Games, on_delete=models.CASCADE,blank=True,null=True)
+    firstPlace=models.CharField(max_length=100, blank=True)
+    secondPlace=models.CharField(max_length=100, blank=True)
+    thirdPlace=models.CharField(max_length=100, blank=True)
+
+    def __str__(self):
+        return self.roundId.Name
+    
+class Award(models.Model):
+    gameId=models.ForeignKey(Games, on_delete=models.CASCADE,blank=True)
+    firstPlace=models.IntegerField(blank=True)
+    secondPlace=models.IntegerField(blank=True)
+    thirdPlace=models.IntegerField(blank=True)
+
+    def __str__(self):
+        return self.gameId.Name

@@ -1,4 +1,3 @@
 venv/*
-db.sqlite3
-events/__pycache__
+event/__pycache__
 .vscode

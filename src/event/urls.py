@@ -8,5 +8,9 @@ urlpatterns = [
     path('postRound/', views.postRound),
     path('postUser/', views.postUser),
     path('getLogin/',views.loginUser),
-    path('updateRound/<int:pk>/', views.GameRoundUpdateView.as_view())
+    path('updateRound/<int:pk>/', views.GameRoundUpdateView.as_view()),
+    path('updateUser/<int:pk>/', views.StudentUpdateView.as_view()),
+    path('getGame/', views.getGames),
+    path('DeleteRound/<int:pk>/', views.deleteRound),
+    path('postWinner/', views.postWinner),
 ]

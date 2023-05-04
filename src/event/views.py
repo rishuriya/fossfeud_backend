@@ -22,6 +22,14 @@ def getStudents(request):
     return Response(response)
 
 @api_view(['GET'])
+def getGames(request):
+    response={}
+    game=Games.objects.all()
+    gameSerialiser=GamesSerilizer(game,many=True)
+    response["Rounds"]=gameSerialiser.data
+    return Response(response)
+
+@api_view(['GET'])
 def getGameRounds(request):
     response={}
     gameName = request.query_params.get('gameName')
@@ -31,6 +39,7 @@ def getGameRounds(request):
     else:
         round_data= gameRounds.objects.all()
     serializers=RoundsSerilizer(round_data, many=True)
+    print(serializers.data)
     total_data=len(serializers.data)
     for t in range(total_data):
         total_participants=len(serializers.data[t]["Participants"])
@@ -44,8 +53,14 @@ def getGameRounds(request):
             serializers.data[t]["Participants"].pop(0)
         game=Games.objects.values().filter(id=serializers.data[t]["Game"])
         gameSerialiser=GamesSerilizer(game,many=True)
+        award=Award.objects.values().filter(gameId=gameSerialiser.data[0]["id"])
+        awardSerialiser=awardSerializer(award,many=True)
+        gameSerialiser.data[0]["gameAward"]=awardSerialiser.data
         serializers.data[t]["Game"]=gameSerialiser.data
-        response["rounds"]=serializers.data
+        winner=winners.objects.values().filter(roundId=serializers.data[t]["id"])
+        winnerSerialiser=WinnerSerializer(winner,many=True)
+        serializers.data[t]["Winner"]=winnerSerialiser.data
+    response["rounds"]=serializers.data
     return Response(response)
 
 @api_view(['POST'])
@@ -96,3 +111,33 @@ class GameRoundUpdateView(generics.UpdateAPIView):
         else:
             print("not saved")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class StudentUpdateView(generics.UpdateAPIView):
+    queryset = Registered.objects.all()
+    serializer_class = StudentsSerializer
+
+    def put(self, request, *args, **kwargs):
+        print(request.data)
+        instance = self.get_object()
+        serializer = self.serializer_class(instance, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            print("saved")
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            print("not saved")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['DELETE'])
+def deleteRound(request):
+    print(request.data)
+    instance = gameRounds.objects.get(id=request.data["id"])
+    instance.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def postWinner(request):
+    serializer = WinnerSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+    return Response(serializer.data)
